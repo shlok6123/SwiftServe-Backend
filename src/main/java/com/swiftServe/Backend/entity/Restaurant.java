@@ -12,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class Restaurant {
     @Id
-    private Long rest_id;
+    private Long id;
 
     @Column(nullable = false)
-    private String rest_name;
+    private String name;
 
     @Column(nullable = false)
     private String address;

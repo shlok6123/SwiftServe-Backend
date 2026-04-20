@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class MenuItem {
 
     @Id
-    private Long menu_id;
+    private Long id;
 
     private String name;
 
@@ -17,7 +17,7 @@ public class MenuItem {
 
     private String category;
 
-    private boolean isVegetarian;
+    private boolean isVeg;
 
 
 
