@@ -1,5 +1,6 @@
 package com.swiftServe.Backend.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,9 +16,9 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String email;
 
     private String name;
