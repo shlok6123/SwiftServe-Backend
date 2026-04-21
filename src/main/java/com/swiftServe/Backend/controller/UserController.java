@@ -1,5 +1,6 @@
 package com.swiftServe.Backend.controller;
 
+import com.swiftServe.Backend.dto.request.LoginRequestDto;
 import com.swiftServe.Backend.dto.request.UserRegistrationRequest;
 import com.swiftServe.Backend.dto.response.ApiResponse;
 import com.swiftServe.Backend.dto.response.UserResponse;
@@ -31,5 +32,12 @@ public class UserController {
         ApiResponse<UserResponse> response=new ApiResponse<>(true,"User Registerd Successfully",user);
 
         return new ResponseEntity<>(response,HttpStatus.CREATED);
+    }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<String>> login(@RequestBody LoginRequestDto loginRequest){
+        String token=userService.login(loginRequest);
+        return  ResponseEntity.ok(new ApiResponse<>(true,"Login Successfull",token));
     }
 }
