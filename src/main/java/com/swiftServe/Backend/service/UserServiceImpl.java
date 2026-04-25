@@ -4,6 +4,7 @@ import com.swiftServe.Backend.dto.request.LoginRequestDto;
 import com.swiftServe.Backend.dto.request.UserRegistrationRequest;
 import com.swiftServe.Backend.dto.response.UserResponse;
 import com.swiftServe.Backend.entity.User;
+import com.swiftServe.Backend.exception.ResourceNotFoundException;
 import com.swiftServe.Backend.repository.UserRepo;
 import com.swiftServe.Backend.security.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +53,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(LoginRequestDto loginRequest) {
-        User user=userRepo.findByEmail(loginRequest.getEmail()).orElseThrow(()->new RuntimeException("User Not Found"));
+    public String login(LoginRequestDto loginRequest) throws RuntimeException {
+        User user=userRepo.findByEmail(loginRequest.getEmail()).orElseThrow(()->new ResourceNotFoundException("User Not Found with "+loginRequest.getEmail()));
 
         if(!passwordEncoder.matches(loginRequest.getPassword(),user.getPassword())){
             log.warn("Invalid Email or Password");
