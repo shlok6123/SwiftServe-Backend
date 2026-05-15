@@ -1,0 +1,113 @@
+.orders-page {
+  padding-top: 3rem;
+  padding-bottom: 5rem;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.order-id h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.2rem;
+}
+
+.order-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.order-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background: var(--bg-secondary);
+}
+
+.status-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.badge-pending { color: #f59e0b; }
+.badge-delivered { color: #10b981; }
+.badge-processing { color: #3b82f6; }
+
+.order-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.restaurant-details {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.order-items {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+}
+
+.delivery-address {
+  max-width: 60%;
+}
+
+.delivery-address p {
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.order-total {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.order-total strong {
+  color: var(--accent-primary);
+  font-size: 1.5rem;
+}
