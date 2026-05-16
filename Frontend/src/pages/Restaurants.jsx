@@ -10,14 +10,14 @@ const Restaurants = () => {
   const [error, setError] = useState('');
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [filters, setFilters] = useState({ cuisine: '', rating: '' });
 
-  const fetchRestaurants = async (pageNum, isLoadMore = false) => {
+  const fetchRestaurants = async (pageNum, isLoadMore = false, currentFilters = filters) => {
     if (isLoadMore) setLoadingMore(true);
     else setLoading(true);
 
     try {
-      const data = await restaurantService.getAll('', pageNum, 8);
-      // Spring Page object has content field
+      const data = await restaurantService.getAll('', pageNum, 8, currentFilters.cuisine, currentFilters.rating);
       const newRestaurants = data.content || [];
       
       if (isLoadMore) {
@@ -26,10 +26,9 @@ const Restaurants = () => {
         setRestaurants(newRestaurants);
       }
       
-      setHasMore(!data.last); // 'last' is a boolean in Spring Page object
+      setHasMore(!data.last);
     } catch (err) {
-      setError('Failed to fetch restaurants. Make sure the backend is running.');
-      console.error(err);
+      setError('Failed to fetch restaurants.');
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -37,8 +36,13 @@ const Restaurants = () => {
   };
 
   useEffect(() => {
-    fetchRestaurants(0);
-  }, []);
+    setPage(0);
+    fetchRestaurants(0, false);
+  }, [filters]);
+
+  const handleFilterChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -48,9 +52,29 @@ const Restaurants = () => {
 
   return (
     <div className="restaurants-page container">
-      <div className="page-header">
-        <h1 className="page-title">Explore Restaurants</h1>
-        <p className="page-subtitle">Discover the best food around you.</p>
+      <div className="page-header d-flex justify-between align-items-end">
+        <div>
+          <h1 className="page-title">Explore Restaurants</h1>
+          <p className="page-subtitle">Discover the best food around you.</p>
+        </div>
+        
+        <div className="filters-bar d-flex gap-3">
+          <select name="cuisine" className="input-field" value={filters.cuisine} onChange={handleFilterChange}>
+            <option value="">All Cuisines</option>
+            <option value="Indian">Indian</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Italian">Italian</option>
+            <option value="Mexican">Mexican</option>
+            <option value="American">American</option>
+          </select>
+          
+          <select name="rating" className="input-field" value={filters.rating} onChange={handleFilterChange}>
+            <option value="">Any Rating</option>
+            <option value="4">4+ Stars</option>
+            <option value="3">3+ Stars</option>
+            <option value="2">2+ Stars</option>
+          </select>
+        </div>
       </div>
 
       {loading && restaurants.length === 0 ? (

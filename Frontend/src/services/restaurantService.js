@@ -1,8 +1,8 @@
 import api from './api';
 
 const restaurantService = {
-  getAll: async (keyword = '', page = 0, size = 10) => {
-    const response = await api.get(`/restaurants/search?keyword=${keyword}&page=${page}&size=${size}`);
+  getAll: async (keyword = '', page = 0, size = 10, cuisine = '', rating = '') => {
+    const response = await api.get(`/restaurants/search?keyword=${keyword}&page=${page}&size=${size}&cuisine=${cuisine}&rating=${rating}`);
     return response.data;
   },
 

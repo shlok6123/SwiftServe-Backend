@@ -4,6 +4,7 @@ import restaurantService from '../services/restaurantService';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { Plus } from 'lucide-react';
+import ReviewSection from '../components/ReviewSection';
 import './RestaurantDetails.css';
 
 const RestaurantDetails = () => {
@@ -103,6 +104,10 @@ const RestaurantDetails = () => {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="container pb-5">
+        <ReviewSection restaurantId={id} />
       </div>
     </div>
   );

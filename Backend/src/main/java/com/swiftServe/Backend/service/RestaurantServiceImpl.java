@@ -59,6 +59,12 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    public Page<Restaurant> searchWithFilters(String keyword, String cuisine, Double rating, Pageable pageable) {
+        log.info("Search with filters - keyword: {}, cuisine: {}, rating: {}", keyword, cuisine, rating);
+        return restaurantRepo.searchWithFilters(keyword, cuisine, rating, pageable);
+    }
+
+    @Override
     public Restaurant updateRestaurant(Long id, RestaurantDto dto) {
         Restaurant restaurant = restaurantRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with id: " + id));

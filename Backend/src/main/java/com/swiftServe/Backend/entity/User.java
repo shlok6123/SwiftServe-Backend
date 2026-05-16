@@ -27,5 +27,14 @@ public class User {
     @JsonIgnore
     private String password;
 
+    @ManyToMany
+    @JoinTable(
+        name = "user_favorites",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "restaurant_id")
+    )
+    private List<Restaurant> favoriteRestaurants = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
 }

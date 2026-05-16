@@ -29,6 +29,9 @@ const Navbar = () => {
           {isAuthenticated && user?.userRole === 'RESTAURANT_OWNER' && (
             <Link to="/dashboard" className="nav-link text-gradient">Dashboard</Link>
           )}
+          {isAuthenticated && user?.userRole === 'ADMIN' && (
+            <Link to="/admin" className="nav-link text-gradient">Admin Panel</Link>
+          )}
         </div>
         
         <div className="navbar-actions">

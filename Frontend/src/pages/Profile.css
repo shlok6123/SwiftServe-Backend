@@ -4,6 +4,16 @@
   padding: 2rem 1rem;
 }
 
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.fill-danger {
+  fill: #ff4757;
+}
+
 .profile-container {
   padding: 2.5rem;
   border-radius: 16px;

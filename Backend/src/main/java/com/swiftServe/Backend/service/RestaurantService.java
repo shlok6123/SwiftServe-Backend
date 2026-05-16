@@ -14,6 +14,7 @@ public interface RestaurantService {
     public Restaurant createRestaurant(RestaurantDto dto);
     public Restaurant findById(Long id);
     public Page<Restaurant> searchRestaurants(String keyword, Pageable pageable);
+    public Page<Restaurant> searchWithFilters(String keyword, String cuisine, Double rating, Pageable pageable);
     public Restaurant updateRestaurant(Long id, RestaurantDto dto);
     public void deleteRestaurant(Long id);
     public List<Restaurant> getMyRestaurants(String email);

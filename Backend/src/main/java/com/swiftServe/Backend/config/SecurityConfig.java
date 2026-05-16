@@ -54,7 +54,10 @@ public class SecurityConfig {
                                 "/webjars/**" // Sometimes needed for Swagger CSS/JS
                         ).permitAll()
 
-                        // 3. Everything else requires a valid JWT
+                        // 3. Admin Endpoints
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // 4. Everything else requires a valid JWT
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -47,11 +47,13 @@ public class RestaurantController {
 
     @GetMapping("/search")
     public ResponseEntity<Page<Restaurant>> searchRestaurant(
-            @RequestParam String keyword,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String cuisine,
+            @RequestParam(required = false) Double rating,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Restaurant> list = restaurantService.searchRestaurants(keyword, pageable);
+        Page<Restaurant> list = restaurantService.searchWithFilters(keyword, cuisine, rating, pageable);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 

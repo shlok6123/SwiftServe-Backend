@@ -1,0 +1,51 @@
+.admin-dashboard {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.admin-icon-bg {
+  background: var(--accent-primary);
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.admin-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.admin-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.badge-admin {
+  background-color: rgba(128, 90, 213, 0.2);
+  color: #b794f4;
+}
+
+.badge-driver {
+  background-color: rgba(56, 161, 105, 0.2);
+  color: #68d391;
+}

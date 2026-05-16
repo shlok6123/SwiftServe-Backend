@@ -11,6 +11,7 @@ import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import OwnerDashboard from './pages/OwnerDashboard';
 import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
 import './index.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/dashboard" element={<OwnerDashboard />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/admin" element={<AdminDashboard />} />
               </Routes>
             </main>
           </div>

@@ -2,17 +2,20 @@ import { useState, useContext, useEffect } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import authService from '../services/authService';
-import { User, Mail, Shield, Save, ListOrdered } from 'lucide-react';
+import favoriteService from '../services/favoriteService';
+import RestaurantCard from '../components/RestaurantCard';
+import { User, Mail, Shield, Save, ListOrdered, Heart } from 'lucide-react';
 import './Profile.css';
 
 const Profile = () => {
-  const { user, isAuthenticated, login } = useContext(AuthContext); // Re-using login function to update context user if needed
+  const { user, isAuthenticated, login } = useContext(AuthContext); 
 
   const [formData, setFormData] = useState({
     name: '',
     email: ''
   });
   
+  const [favorites, setFavorites] = useState([]);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
 
@@ -22,8 +25,18 @@ const Profile = () => {
         name: user.name || '',
         email: user.email || ''
       });
+      fetchFavorites();
     }
   }, [user]);
+
+  const fetchFavorites = async () => {
+    try {
+      const res = await favoriteService.getFavorites();
+      if (res.success) setFavorites(res.data);
+    } catch (err) {
+      console.error('Failed to fetch favorites');
+    }
+  };
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -121,9 +134,24 @@ const Profile = () => {
         </form>
 
         <div className="profile-actions mt-4 text-center border-top pt-4">
-          <Link to="/orders" className="btn btn-outline">
+          <Link to="/orders" className="btn btn-outline mb-4">
             <ListOrdered size={18} className="mr-2 inline" /> View Order History
           </Link>
+        </div>
+
+        <div className="favorites-section mt-4 border-top pt-4">
+          <h3 className="mb-4 d-flex align-items-center justify-center">
+            <Heart size={20} className="mr-2 text-danger fill-danger" /> Your Favorites
+          </h3>
+          {favorites.length === 0 ? (
+            <p className="text-secondary text-center">You haven't favorited any restaurants yet.</p>
+          ) : (
+            <div className="favorites-grid">
+              {favorites.map(restaurant => (
+                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
