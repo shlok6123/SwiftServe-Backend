@@ -39,5 +39,5 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MenuItem> menuItems;
 
-    boolean isOpen;
+    private Boolean isOpen = true;
 }

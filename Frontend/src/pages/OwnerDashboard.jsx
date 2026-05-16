@@ -21,7 +21,9 @@ const OwnerDashboard = () => {
     description: '',
     price: '',
     category: '',
-    restaurantId: ''
+    restaurantId: '',
+    isVeg: false,
+    isAvailable: true
   });
 
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -43,7 +45,8 @@ const OwnerDashboard = () => {
   };
 
   const handleMenuChange = (e) => {
-    setMenuItemData({ ...menuItemData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setMenuItemData({ ...menuItemData, [name]: type === 'checkbox' ? checked : value });
   };
 
   const handleAddRestaurant = async (e) => {
@@ -72,7 +75,7 @@ const OwnerDashboard = () => {
       const response = await api.post('/Menu/add', payload);
       if (response.data.success) {
         setMessage({ type: 'success', text: `Item "${response.data.data.name}" added to menu!` });
-        setMenuItemData({ ...menuItemData, name: '', description: '', price: '', category: '' }); // keep restaurantId
+        setMenuItemData({ ...menuItemData, name: '', description: '', price: '', category: '', isVeg: false, isAvailable: true }); // keep restaurantId
       }
     } catch (err) {
       setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to add menu item' });
@@ -153,6 +156,16 @@ const OwnerDashboard = () => {
                 <label>Category</label>
                 <input type="text" name="category" className="input-field" value={menuItemData.category} onChange={handleMenuChange} required />
               </div>
+            </div>
+            <div className="grid-2-col mt-2">
+              <label className="checkbox-label">
+                <input type="checkbox" name="isVeg" checked={menuItemData.isVeg} onChange={handleMenuChange} />
+                🌿 Vegetarian
+              </label>
+              <label className="checkbox-label">
+                <input type="checkbox" name="isAvailable" checked={menuItemData.isAvailable} onChange={handleMenuChange} />
+                ✅ Available
+              </label>
             </div>
             <button type="submit" className="btn btn-primary mt-3" disabled={loading}>
               Add to Menu

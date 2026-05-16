@@ -24,10 +24,9 @@ public class MenuItem {
 
     private String category;
 
-    private boolean isVeg;
+    private Boolean isVeg = false;
 
-
-private boolean isAvailable= true;
+    private Boolean isAvailable = true;
     private LocalDateTime createdAt;
     private BigDecimal price;
 

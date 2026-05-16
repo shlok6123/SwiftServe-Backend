@@ -111,7 +111,7 @@ const Cart = () => {
           <h3>Order Summary</h3>
           <div className="summary-row">
             <span>Subtotal</span>
-            <span>${cart.totalPrice.toFixed(2)}</span>
+            <span>${cart.totalAmount.toFixed(2)}</span>
           </div>
           <div className="summary-row">
             <span>Delivery Fee</span>
@@ -119,7 +119,7 @@ const Cart = () => {
           </div>
           <div className="summary-row total-row">
             <span>Total</span>
-            <span>${(cart.totalPrice + 2.99).toFixed(2)}</span>
+            <span>${(cart.totalAmount + 2.99).toFixed(2)}</span>
           </div>
 
           {error && <div className="error-message mt-3">{error}</div>}

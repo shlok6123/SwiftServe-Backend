@@ -39,6 +39,8 @@ public class MenuServiceImpl implements  MenuService{
         item.setCategory(dto.getCategory());
         item.setPrice(BigDecimal.valueOf(dto.getPrice()));
         item.setDescription(dto.getDescription());
+        item.setIsVeg(dto.getIsVeg() != null ? dto.getIsVeg() : false);
+        item.setIsAvailable(dto.getIsAvailable() != null ? dto.getIsAvailable() : true);
         item.setRestaurant(restaurant);
 
         return menuRepo.save(item);
