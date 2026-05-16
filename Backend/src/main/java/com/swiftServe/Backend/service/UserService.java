@@ -2,6 +2,7 @@ package com.swiftServe.Backend.service;
 
 import com.swiftServe.Backend.dto.request.LoginRequestDto;
 import com.swiftServe.Backend.dto.request.UserRegistrationRequest;
+import com.swiftServe.Backend.dto.request.UpdateProfileRequest;
 import com.swiftServe.Backend.dto.response.UserResponse;
 import com.swiftServe.Backend.entity.User;
 

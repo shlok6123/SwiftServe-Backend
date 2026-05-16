@@ -1,6 +1,7 @@
 package com.swiftServe.Backend.dto.response;
 
 import com.swiftServe.Backend.entity.OrderStatus;
+import com.swiftServe.Backend.entity.PaymentStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;

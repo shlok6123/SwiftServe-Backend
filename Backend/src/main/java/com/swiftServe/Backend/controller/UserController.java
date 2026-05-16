@@ -2,6 +2,7 @@ package com.swiftServe.Backend.controller;
 
 import com.swiftServe.Backend.dto.request.LoginRequestDto;
 import com.swiftServe.Backend.dto.request.UserRegistrationRequest;
+import com.swiftServe.Backend.dto.request.UpdateProfileRequest;
 import com.swiftServe.Backend.dto.response.ApiResponse;
 import com.swiftServe.Backend.dto.response.UserResponse;
 import com.swiftServe.Backend.entity.User;
@@ -9,10 +10,7 @@ import com.swiftServe.Backend.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/users")
@@ -58,7 +56,7 @@ public class UserController {
     @PutMapping("/profile")
     public ResponseEntity<ApiResponse<UserResponse>> updateProfile(
             @RequestHeader("Authorization") String jwt,
-            @Valid @RequestBody com.swiftServe.Backend.dto.request.UpdateProfileRequest request) {
+            @Valid @RequestBody UpdateProfileRequest request) {
         String token = jwt.startsWith("Bearer ") ? jwt.substring(7) : jwt;
         UserResponse updatedProfile = userService.updateProfile(token, request);
         return new ResponseEntity<>(new ApiResponse<>(true, "Profile updated successfully", updatedProfile), HttpStatus.OK);

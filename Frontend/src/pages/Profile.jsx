@@ -29,6 +29,10 @@ const Profile = () => {
     return <Navigate to="/login" />;
   }
 
+  if (!user) {
+    return <div className="container mt-5 text-center"><div className="spinner mx-auto"></div><p className="mt-2">Loading profile...</p></div>;
+  }
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };

@@ -2,6 +2,7 @@ package com.swiftServe.Backend.service;
 
 import com.swiftServe.Backend.dto.request.LoginRequestDto;
 import com.swiftServe.Backend.dto.request.UserRegistrationRequest;
+import com.swiftServe.Backend.dto.request.UpdateProfileRequest;
 import com.swiftServe.Backend.dto.response.UserResponse;
 import com.swiftServe.Backend.entity.User;
 import com.swiftServe.Backend.exception.ResourceNotFoundException;
@@ -71,7 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateProfile(String jwt, com.swiftServe.Backend.dto.request.UpdateProfileRequest request) {
+    public UserResponse updateProfile(String jwt, UpdateProfileRequest request) {
         User user = findUserByJwt(jwt);
 
         // Check if email is being changed and if it already exists
@@ -91,4 +92,3 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 }
-

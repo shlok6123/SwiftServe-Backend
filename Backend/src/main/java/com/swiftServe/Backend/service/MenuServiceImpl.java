@@ -8,10 +8,12 @@ import com.swiftServe.Backend.repository.MenuRepo;
 import com.swiftServe.Backend.repository.RestaurantRepo;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 @Service
+@Transactional
 public class MenuServiceImpl implements MenuService {
 
     private final MenuRepo menuRepo;

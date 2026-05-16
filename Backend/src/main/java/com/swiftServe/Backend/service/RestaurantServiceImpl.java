@@ -11,12 +11,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 @Slf4j
-public class RestaurantServiceImpl implements RestaurantService{
+public class RestaurantServiceImpl implements RestaurantService {
 
     private final RestaurantRepo restaurantRepo;
     private final UserRepo userRepo;
@@ -28,25 +30,26 @@ public class RestaurantServiceImpl implements RestaurantService{
 
     @Override
     public Restaurant createRestaurant(RestaurantDto dto) {
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User owner = userRepo.findByEmail(currentUserEmail).orElseThrow(() -> new ResourceNotFoundException("User Not Found " + currentUserEmail));
 
-       String currentUserEmail= SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User owner=userRepo.findByEmail(currentUserEmail).orElseThrow(()->new ResourceNotFoundException("User Not Found "+currentUserEmail));
-
-        Restaurant restaurant=new Restaurant();
+        Restaurant restaurant = new Restaurant();
         restaurant.setName(dto.getName());
         restaurant.setAddress(dto.getAddress());
         restaurant.setContactNumber(dto.getContactNumber());
         restaurant.setImageUrl(dto.getImageUrl());
         restaurant.setDescription(dto.getDescription());
         restaurant.setOwner(owner);
+        restaurant.setIsOpen(true);
+        restaurant.setRating(0.0);
 
         return restaurantRepo.save(restaurant);
     }
 
-    public Restaurant findById(Long id){
+    @Override
+    public Restaurant findById(Long id) {
         log.info("Finding Restaurant with id: {}", id);
-        return restaurantRepo.findById(id).orElseThrow(()->new ResourceNotFoundException("The Restaurant Not found with "+id));
+        return restaurantRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("The Restaurant Not found with " + id));
     }
 
     @Override
