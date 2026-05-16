@@ -24,6 +24,7 @@ public class User {
     private String email;
 
     private String name;
+    @JsonIgnore
     private String password;
 
     private UserRole userRole;

@@ -38,10 +38,15 @@ const Navbar = () => {
           </Link>
           
           {isAuthenticated ? (
-            <button onClick={handleLogout} className="btn btn-secondary btn-sm">
-              <LogOut size={18} />
-              <span>Logout</span>
-            </button>
+            <div className="d-flex align-items-center gap-2">
+              <Link to="/profile" className="btn btn-secondary btn-sm" title="Profile">
+                <User size={18} />
+              </Link>
+              <button onClick={handleLogout} className="btn btn-secondary btn-sm">
+                <LogOut size={18} />
+                <span>Logout</span>
+              </button>
+            </div>
           ) : (
             <Link to="/login" className="btn btn-primary btn-sm">
               <User size={18} />

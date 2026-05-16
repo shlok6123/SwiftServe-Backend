@@ -47,3 +47,14 @@
     transform: rotate(360deg);
   }
 }
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 4rem;
+}
+
+.load-more-container .btn {
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+}

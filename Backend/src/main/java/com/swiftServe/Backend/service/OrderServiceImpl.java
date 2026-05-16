@@ -55,6 +55,13 @@ public class OrderServiceImpl implements OrderService {
         order.setDeliveryAddress(request.getDeliveryAddress());
         order.setTotalAmount(cart.getTotalAmount());
         order.setStatus(OrderStatus.PENDING);
+        order.setPaymentMethod(request.getPaymentMethod());
+        
+        if ("ONLINE".equalsIgnoreCase(request.getPaymentMethod())) {
+            order.setPaymentStatus(PaymentStatus.PAID);
+        } else {
+            order.setPaymentStatus(PaymentStatus.PENDING);
+        }
 
         Order savedOrder = orderRepo.save(order);
 
@@ -130,6 +137,8 @@ public class OrderServiceImpl implements OrderService {
         response.setDeliveryAddress(order.getDeliveryAddress());
         response.setTotalAmount(order.getTotalAmount());
         response.setStatus(order.getStatus());
+        response.setPaymentStatus(order.getPaymentStatus());
+        response.setPaymentMethod(order.getPaymentMethod());
         response.setCreatedAt(order.getCreatedAt());
 
         List<OrderItemResponse> itemResponses = order.getItems().stream().map(item -> {

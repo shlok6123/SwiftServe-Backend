@@ -24,6 +24,8 @@ public class MenuItem {
 
     private String category;
 
+    private String imageUrl;
+
     private Boolean isVeg = false;
 
     private Boolean isAvailable = true;

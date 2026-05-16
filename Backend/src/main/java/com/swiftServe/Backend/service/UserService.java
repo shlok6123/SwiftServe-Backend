@@ -10,4 +10,5 @@ public interface UserService {
     String login(LoginRequestDto loginRequest);
 
     User findUserByJwt(String jwt);
+    UserResponse updateProfile(String jwt, UpdateProfileRequest request);
 }

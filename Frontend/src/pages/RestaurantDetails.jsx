@@ -74,6 +74,11 @@ const RestaurantDetails = () => {
           <div className="menu-grid">
             {restaurant.menuItems.map(item => (
               <div key={item.id} className="menu-item-card glass">
+                {item.imageUrl && (
+                  <div className="menu-item-image">
+                    <img src={item.imageUrl} alt={item.name} />
+                  </div>
+                )}
                 <div className="menu-item-info">
                   <div className="item-header">
                     <h3>{item.name}</h3>
@@ -82,16 +87,18 @@ const RestaurantDetails = () => {
                     </span>
                   </div>
                   <p className="item-description">{item.description}</p>
-                  <span className="item-price">${item.price?.toFixed(2) || '0.00'}</span>
+                  <div className="item-footer">
+                    <span className="item-price">${item.price?.toFixed(2) || '0.00'}</span>
+                    <button 
+                      className="btn btn-primary add-btn" 
+                      onClick={() => handleAddToCart(item.id)}
+                      disabled={!item.isAvailable}
+                    >
+                      <Plus size={20} />
+                      {item.isAvailable ? 'Add' : 'Sold Out'}
+                    </button>
+                  </div>
                 </div>
-                <button 
-                  className="btn btn-primary add-btn" 
-                  onClick={() => handleAddToCart(item.id)}
-                  disabled={!item.isAvailable}
-                >
-                  <Plus size={20} />
-                  {item.isAvailable ? 'Add' : 'Sold Out'}
-                </button>
               </div>
             ))}
           </div>

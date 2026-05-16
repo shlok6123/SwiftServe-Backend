@@ -8,4 +8,7 @@ public class OrderRequest {
     
     @NotBlank(message = "Delivery address is required")
     private String deliveryAddress;
+
+    @NotBlank(message = "Payment method is required")
+    private String paymentMethod;
 }

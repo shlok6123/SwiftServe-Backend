@@ -69,5 +69,26 @@ public class UserServiceImpl implements UserService {
         return userRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
+
+    @Override
+    public UserResponse updateProfile(String jwt, com.swiftServe.Backend.dto.request.UpdateProfileRequest request) {
+        User user = findUserByJwt(jwt);
+
+        // Check if email is being changed and if it already exists
+        if (!user.getEmail().equals(request.getEmail()) && userRepo.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email is already in use by another account");
+        }
+
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        User updatedUser = userRepo.save(user);
+
+        UserResponse response = new UserResponse();
+        response.setId(updatedUser.getId());
+        response.setName(updatedUser.getName());
+        response.setEmail(updatedUser.getEmail());
+        response.setUserRole(updatedUser.getUserRole());
+        return response;
+    }
 }
 

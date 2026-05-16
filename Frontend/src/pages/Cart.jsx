@@ -12,6 +12,7 @@ const Cart = () => {
   const navigate = useNavigate();
 
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('CASH_ON_DELIVERY');
   const [checkingOut, setCheckingOut] = useState(false);
   const [error, setError] = useState('');
 
@@ -47,7 +48,7 @@ const Cart = () => {
     setError('');
 
     try {
-      const response = await orderService.checkout(deliveryAddress);
+      const response = await orderService.checkout(deliveryAddress, paymentMethod);
       if (response.success) {
         await clearCart();
         navigate('/orders', { state: { message: 'Order placed successfully!' } });
@@ -125,6 +126,20 @@ const Cart = () => {
           {error && <div className="error-message mt-3">{error}</div>}
 
           <form onSubmit={handleCheckout} className="checkout-form">
+            <div className="input-group">
+              <label htmlFor="paymentMethod">Payment Method</label>
+              <select 
+                id="paymentMethod"
+                className="input-field mb-3"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                required
+              >
+                <option value="CASH_ON_DELIVERY">Cash on Delivery</option>
+                <option value="ONLINE">Pay Online (Mock)</option>
+              </select>
+            </div>
+
             <div className="input-group">
               <label htmlFor="address">Delivery Address</label>
               <textarea 

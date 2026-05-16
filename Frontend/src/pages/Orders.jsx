@@ -78,24 +78,24 @@ const Orders = () => {
               <div className="order-header">
                 <div className="order-id">
                   <h3>Order #{order.id}</h3>
-                  <span className="order-date">{new Date().toLocaleDateString()}</span>
+                  <span className="order-date">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'Recent'}</span>
                 </div>
-                <div className={`order-status badge-${order.orderStatus.toLowerCase()}`}>
-                  {getStatusIcon(order.orderStatus)}
-                  {order.orderStatus}
+                <div className={`order-status badge-${order.status.toLowerCase()}`}>
+                  {getStatusIcon(order.status)}
+                  {order.status}
                 </div>
               </div>
               
               <div className="order-body">
                 <div className="restaurant-details">
                   <span className="text-secondary">From:</span>
-                  <strong>{order.restaurant.name}</strong>
+                  <strong>{order.restaurantName}</strong>
                 </div>
                 <div className="order-items">
-                  {order.orderItems.map((item, idx) => (
+                  {order.items.map((item, idx) => (
                     <div key={idx} className="order-item-row">
-                      <span>{item.quantity}x {item.menuItem.name}</span>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span>{item.quantity}x {item.menuItemName}</span>
+                      <span>${item.totalPrice?.toFixed(2) || '0.00'}</span>
                     </div>
                   ))}
                 </div>
@@ -108,7 +108,7 @@ const Orders = () => {
                 </div>
                 <div className="order-total">
                   <span>Total:</span>
-                  <strong>${order.totalPrice.toFixed(2)}</strong>
+                  <strong>${order.totalAmount?.toFixed(2) || '0.00'}</strong>
                 </div>
               </div>
             </div>

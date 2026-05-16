@@ -10,6 +10,7 @@ import RestaurantDetails from './pages/RestaurantDetails';
 import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import OwnerDashboard from './pages/OwnerDashboard';
+import Profile from './pages/Profile';
 import './index.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/dashboard" element={<OwnerDashboard />} />
+                <Route path="/profile" element={<Profile />} />
               </Routes>
             </main>
           </div>

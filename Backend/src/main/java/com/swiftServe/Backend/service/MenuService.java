@@ -6,4 +6,7 @@ import com.swiftServe.Backend.entity.MenuItem;
 public interface MenuService {
 
     public MenuItem addItem(MenuItemDto dto);
+    public MenuItem updateItem(Long id, MenuItemDto dto);
+    public void deleteItem(Long id);
+    public MenuItem toggleAvailability(Long id);
 }
