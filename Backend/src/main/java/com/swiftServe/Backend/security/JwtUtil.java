@@ -1,14 +1,16 @@
 package com.swiftServe.Backend.security;
 
+import com.swiftServe.Backend.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
-import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
@@ -16,40 +18,48 @@ import java.util.Date;
 @Slf4j
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "your_very_long_and_very_secure_secret_key_for_swiftserve";
-    private static final long EXPIRATION_TIME = 86400000;
+    private final String secret;
+    private final long expirationMs;
 
-    private Key getSigningKey(){
-        byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+    public JwtUtil(
+            @Value("${jwt.secret:your_very_long_and_very_secure_secret_key_for_swiftserve}") String secret,
+            @Value("${jwt.expiration-ms:86400000}") long expirationMs) {
+        this.secret = secret;
+        this.expirationMs = expirationMs;
     }
 
+    private Key getSigningKey() {
+        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // 2. Extract Username (Email)
     public String extractEmail(String token) {
         return getClaims(token).getSubject();
     }
 
-    // 3. Check if Token is Expired
     public boolean isTokenExpired(String token) {
         return getClaims(token).getExpiration().before(new Date());
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.warn("JWT validation failed: {}", ex.getMessage());
+            throw new UnauthorizedException("Invalid or expired token");
+        }
     }
-
 }

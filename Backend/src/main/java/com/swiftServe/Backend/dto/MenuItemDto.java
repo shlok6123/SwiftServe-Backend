@@ -22,4 +22,9 @@ public class MenuItemDto {
     
     @NotNull(message = "Restaurant ID is required")
     private Long restaurantId;
+
+    private String imageUrl;
+
+    private Boolean isVeg = false;
+    private Boolean isAvailable = true;
 }

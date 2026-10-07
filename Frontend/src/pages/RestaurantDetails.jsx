@@ -4,6 +4,8 @@ import restaurantService from '../services/restaurantService';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { Plus } from 'lucide-react';
+import ReviewSection from '../components/ReviewSection';
+import Loader from '../components/Loader';
 import './RestaurantDetails.css';
 
 const RestaurantDetails = () => {
@@ -25,7 +27,7 @@ const RestaurantDetails = () => {
         } else {
           setError('Restaurant not found');
         }
-      } catch (err) {
+      } catch {
         setError('Failed to fetch restaurant details.');
       } finally {
         setLoading(false);
@@ -43,12 +45,12 @@ const RestaurantDetails = () => {
     // Could add a nice toast notification here!
   };
 
-  if (loading) return <div className="container loading-state"><div className="spinner"></div></div>;
-  if (error) return <div className="container error-message mt-4">{error}</div>;
+  if (loading) return <div className="container"><Loader center label="Loading menu…" /></div>;
+  if (error) return <div className="container error-message mt-4 anim-shake">{error}</div>;
   if (!restaurant) return null;
 
   // Generate deterministic hero image based on restaurant ID
-  const heroImageUrl = `https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=400&fit=crop&q=80&sig=${restaurant.id || Math.random()}`;
+  const heroImageUrl = `https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=400&fit=crop&q=80&sig=${restaurant.id ?? 'placeholder'}`;
 
   return (
     <div className="restaurant-details-page">
@@ -74,6 +76,11 @@ const RestaurantDetails = () => {
           <div className="menu-grid">
             {restaurant.menuItems.map(item => (
               <div key={item.id} className="menu-item-card glass">
+                {item.imageUrl && (
+                  <div className="menu-item-image">
+                    <img src={item.imageUrl} alt={item.name} />
+                  </div>
+                )}
                 <div className="menu-item-info">
                   <div className="item-header">
                     <h3>{item.name}</h3>
@@ -82,20 +89,26 @@ const RestaurantDetails = () => {
                     </span>
                   </div>
                   <p className="item-description">{item.description}</p>
-                  <span className="item-price">${item.price?.toFixed(2) || '0.00'}</span>
+                  <div className="item-footer">
+                    <span className="item-price">${item.price?.toFixed(2) || '0.00'}</span>
+                    <button 
+                      className="btn btn-primary add-btn" 
+                      onClick={() => handleAddToCart(item.id)}
+                      disabled={!item.isAvailable}
+                    >
+                      <Plus size={20} />
+                      {item.isAvailable ? 'Add' : 'Sold Out'}
+                    </button>
+                  </div>
                 </div>
-                <button 
-                  className="btn btn-primary add-btn" 
-                  onClick={() => handleAddToCart(item.id)}
-                  disabled={!item.isAvailable}
-                >
-                  <Plus size={20} />
-                  {item.isAvailable ? 'Add' : 'Sold Out'}
-                </button>
               </div>
             ))}
           </div>
         )}
+      </div>
+
+      <div className="container pb-5">
+        <ReviewSection restaurantId={id} />
       </div>
     </div>
   );

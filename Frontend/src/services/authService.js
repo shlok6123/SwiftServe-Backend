@@ -20,6 +20,11 @@ const authService = {
     return response.data;
   },
 
+  updateProfile: async (data) => {
+    const response = await api.put('/users/profile', data);
+    return response.data;
+  },
+
   logout: () => {
     localStorage.removeItem('token');
   },

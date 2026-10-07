@@ -1,0 +1,41 @@
+.review-section {
+  max-width: 800px;
+}
+
+.rating-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.star-icon {
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.star-icon:hover {
+  transform: scale(1.2);
+}
+
+.reviewer-avatar {
+  width: 32px;
+  height: 32px;
+  background-color: var(--bg-hover);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.reviewer-name {
+  font-weight: 600;
+}
+
+.review-card {
+  border-radius: 12px;
+  border-left: 4px solid var(--accent-primary);
+}
+
+.review-date {
+  font-size: 0.8rem;
+}

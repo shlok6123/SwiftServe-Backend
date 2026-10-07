@@ -32,29 +32,37 @@ public class SecurityConfig {
     }
 
     @Bean
-     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception{
+    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception{
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // 1. All Public API Endpoints
                         .requestMatchers(
-                            "/api/v1/users/register", 
-                            "/api/v1/users/login",
-                            "/api/v1/restaurants/search",
-                            "/api/v1/restaurants/get/**"
+                                "/",            // Fix: Allows root URL browser testing
+                                "/error",       // Fix: Unmasks internal 500 errors
+                                "/api/v1/users/register",
+                                "/api/v1/users/login",
+                                "/api/v1/restaurants/search",
+                                "/api/v1/restaurants/get/**"
                         ).permitAll()
 
-                        // 2. All Swagger/OpenAPI Endpoints (The "Docs" Gate)
+                        // 2. All Swagger/OpenAPI Endpoints
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/v3/api-docs.yaml",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/webjars/**" // Sometimes needed for Swagger CSS/JS
+                                "/webjars/**"
                         ).permitAll()
 
-                        // 3. Everything else requires a valid JWT
+                        // 3. WebSocket handshake
+                        .requestMatchers("/ws/**").permitAll()
+
+                        // 4. Admin Endpoints
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // 5. Everything else requires a valid JWT
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -66,7 +74,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173")); // Add common frontend ports
+        // Fix: Use allowedOriginPatterns to allow any origin while allowCredentials is true
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

@@ -12,6 +12,7 @@ const Cart = () => {
   const navigate = useNavigate();
 
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('CASH_ON_DELIVERY');
   const [checkingOut, setCheckingOut] = useState(false);
   const [error, setError] = useState('');
 
@@ -47,14 +48,14 @@ const Cart = () => {
     setError('');
 
     try {
-      const response = await orderService.checkout(deliveryAddress);
+      const response = await orderService.checkout(deliveryAddress, paymentMethod);
       if (response.success) {
         await clearCart();
         navigate('/orders', { state: { message: 'Order placed successfully!' } });
       } else {
         setError(response.message || 'Checkout failed');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred during checkout.');
     } finally {
       setCheckingOut(false);
@@ -111,7 +112,7 @@ const Cart = () => {
           <h3>Order Summary</h3>
           <div className="summary-row">
             <span>Subtotal</span>
-            <span>${cart.totalPrice.toFixed(2)}</span>
+            <span>${cart.totalAmount.toFixed(2)}</span>
           </div>
           <div className="summary-row">
             <span>Delivery Fee</span>
@@ -119,12 +120,26 @@ const Cart = () => {
           </div>
           <div className="summary-row total-row">
             <span>Total</span>
-            <span>${(cart.totalPrice + 2.99).toFixed(2)}</span>
+            <span>${(cart.totalAmount + 2.99).toFixed(2)}</span>
           </div>
 
           {error && <div className="error-message mt-3">{error}</div>}
 
           <form onSubmit={handleCheckout} className="checkout-form">
+            <div className="input-group">
+              <label htmlFor="paymentMethod">Payment Method</label>
+              <select 
+                id="paymentMethod"
+                className="input-field mb-3"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                required
+              >
+                <option value="CASH_ON_DELIVERY">Cash on Delivery</option>
+                <option value="ONLINE">Pay Online (Mock)</option>
+              </select>
+            </div>
+
             <div className="input-group">
               <label htmlFor="address">Delivery Address</label>
               <textarea 

@@ -1,6 +1,7 @@
 package com.swiftServe.Backend.dto.response;
 
 import com.swiftServe.Backend.entity.OrderStatus;
+import com.swiftServe.Backend.entity.PaymentStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,8 @@ public class OrderResponse {
     private String deliveryAddress;
     private Double totalAmount;
     private OrderStatus status;
+    private PaymentStatus paymentStatus;
+    private String paymentMethod;
     private LocalDateTime createdAt;
     private List<OrderItemResponse> items;
 }
