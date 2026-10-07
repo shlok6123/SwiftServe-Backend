@@ -7,6 +7,8 @@ COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
+RUN chmod +x ./mvnw
+
 # Fact: -DskipTests speeds up deployment builds
 RUN ./mvnw clean package -DskipTests
 
