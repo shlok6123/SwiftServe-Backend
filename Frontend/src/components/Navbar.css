@@ -8,6 +8,18 @@
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
+  transition: height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.35s ease, box-shadow 0.35s ease,
+              backdrop-filter 0.35s ease;
+}
+
+/* Compact, elevated navbar after scrolling. */
+.navbar-scrolled {
+  height: 64px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
 .navbar-container {
@@ -23,10 +35,16 @@
   gap: 0.5rem;
   font-size: 1.5rem;
   font-weight: 700;
+  transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.04);
 }
 
 .logo-icon {
   color: var(--accent-primary);
+  transition: transform 0.3s ease;
 }
 
 .navbar-links {
@@ -97,6 +115,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 0 2px var(--bg-primary);
 }
 
 .btn-sm {

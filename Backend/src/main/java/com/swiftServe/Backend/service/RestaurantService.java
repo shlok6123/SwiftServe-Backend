@@ -18,5 +18,6 @@ public interface RestaurantService {
     public Restaurant updateRestaurant(Long id, RestaurantDto dto);
     public void deleteRestaurant(Long id);
     public List<Restaurant> getMyRestaurants(String email);
+    public Restaurant toggleOpen(Long id);
 }
 

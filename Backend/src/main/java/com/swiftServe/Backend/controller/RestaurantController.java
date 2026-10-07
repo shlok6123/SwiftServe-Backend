@@ -4,13 +4,14 @@ import com.swiftServe.Backend.dto.RestaurantDto;
 import com.swiftServe.Backend.dto.response.ApiResponse;
 import com.swiftServe.Backend.entity.Restaurant;
 import com.swiftServe.Backend.service.RestaurantService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -22,13 +23,6 @@ public class RestaurantController {
 
     public RestaurantController(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
-    }
-
-    private String cleanJwt(String jwt) {
-        if (jwt != null && jwt.startsWith("Bearer ")) {
-            return jwt.substring(7);
-        }
-        return jwt;
     }
 
     @PostMapping("/add")
@@ -59,7 +53,7 @@ public class RestaurantController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<Restaurant>> updateRestaurant(@PathVariable Long id,
-                                                                     @Valid @RequestBody RestaurantDto dto) {
+                                                                    @Valid @RequestBody RestaurantDto dto) {
         Restaurant updated = restaurantService.updateRestaurant(id, dto);
         ApiResponse<Restaurant> response = new ApiResponse<>(true, "Restaurant updated successfully", updated);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -72,19 +66,21 @@ public class RestaurantController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<Restaurant>>> getMyRestaurants(
-            @RequestHeader("Authorization") String jwt) {
-        String email = extractEmail(jwt);
-        List<Restaurant> restaurants = restaurantService.getMyRestaurants(email);
-        ApiResponse<List<Restaurant>> response = new ApiResponse<>(true, "Your restaurants fetched", restaurants);
+    @PatchMapping("/toggle-open/{id}")
+    public ResponseEntity<ApiResponse<Restaurant>> toggleOpen(@PathVariable Long id) {
+        Restaurant updated = restaurantService.toggleOpen(id);
+        String message = Boolean.TRUE.equals(updated.getIsOpen())
+                ? "Restaurant is now OPEN"
+                : "Restaurant is now CLOSED";
+        ApiResponse<Restaurant> response = new ApiResponse<>(true, message, updated);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    private String extractEmail(String jwt) {
-        // The service layer handles JWT parsing; we just need to pass the email
-        // For now, use SecurityContext since the JWT filter already sets it
-        return org.springframework.security.core.context.SecurityContextHolder
-                .getContext().getAuthentication().getName();
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<List<Restaurant>>> getMyRestaurants() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Restaurant> restaurants = restaurantService.getMyRestaurants(email);
+        ApiResponse<List<Restaurant>> response = new ApiResponse<>(true, "Your restaurants fetched", restaurants);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

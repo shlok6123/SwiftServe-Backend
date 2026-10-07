@@ -1,5 +1,7 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useCallback } from 'react';
 import authService from '../services/authService';
+import orderSocket from '../services/orderSocket';
+import Loader from '../components/Loader';
 
 export const AuthContext = createContext();
 
@@ -8,7 +10,15 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
+  const logout = useCallback(() => {
+    authService.logout();
+    // Tear down the live order socket so a new session reconnects cleanly.
+    orderSocket.disconnect();
+    setIsAuthenticated(false);
+    setUser(null);
+  }, []);
+
+  const fetchUser = useCallback(async () => {
     if (authService.isAuthenticated()) {
       setIsAuthenticated(true);
       try {
@@ -26,11 +36,11 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
     }
     setLoading(false);
-  };
+  }, [logout]);
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [fetchUser]);
 
   const login = async (credentials) => {
     const response = await authService.login(credentials);
@@ -40,13 +50,12 @@ export const AuthProvider = ({ children }) => {
     return response;
   };
 
-  const logout = () => {
-    authService.logout();
-    setIsAuthenticated(false);
-    setUser(null);
-  };
-
-  if (loading) return null; // Or a loading spinner
+  if (loading)
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex' }}>
+        <Loader center label="Warming up SwiftServe…" />
+      </div>
+    );
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>

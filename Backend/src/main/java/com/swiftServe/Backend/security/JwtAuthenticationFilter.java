@@ -1,13 +1,19 @@
 package com.swiftServe.Backend.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swiftServe.Backend.dto.response.ApiResponse;
+import com.swiftServe.Backend.exception.UnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
@@ -26,31 +33,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-     final String authHeader=request.getHeader("Authorization");
-     final String jwt;
-     final String userEmail;
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
 
-     if(authHeader==null || !authHeader.startsWith("Bearer ")){
-         filterChain.doFilter(request,response);
-         return;
-     }
-        jwt = authHeader.substring(7);
-        userEmail = jwtUtil.extractEmail(jwt); // Using your JwtUtil method
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        // 2. If user is found and not already authenticated in this request
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+        final String jwt = authHeader.substring(7);
 
-            // 3. If token is valid, tell Spring Security this user is OK
-            if (!jwtUtil.isTokenExpired(jwt)) {
+        try {
+            String userEmail = jwtUtil.extractEmail(jwt);
+
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+                if (jwtUtil.isTokenExpired(jwt)) {
+                    writeUnauthorized(response, "Token has expired");
+                    return;
+                }
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
-
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+        } catch (UnauthorizedException ex) {
+            writeUnauthorized(response, ex.getMessage());
+            return;
+        } catch (UsernameNotFoundException ex) {
+            writeUnauthorized(response, "User associated with this token no longer exists");
+            return;
         }
+
         filterChain.doFilter(request, response);
+    }
+
+    private void writeUnauthorized(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        ApiResponse<String> body = new ApiResponse<>(false, message, null);
+        objectMapper.writeValue(response.getWriter(), body);
     }
 }

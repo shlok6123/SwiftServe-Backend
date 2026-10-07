@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import reviewService from '../services/reviewService';
 import { Star, Send, User } from 'lucide-react';
@@ -12,20 +12,20 @@ const ReviewSection = ({ restaurantId }) => {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    fetchReviews();
-  }, [restaurantId]);
-
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const res = await reviewService.getRestaurantReviews(restaurantId);
       if (res.success) setReviews(res.data);
-    } catch (err) {
+    } catch {
       console.error('Failed to fetch reviews');
     } finally {
       setLoading(false);
     }
-  };
+  }, [restaurantId]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +43,7 @@ const ReviewSection = ({ restaurantId }) => {
         setMessage('Review posted!');
         setTimeout(() => setMessage(''), 3000);
       }
-    } catch (err) {
+    } catch {
       console.error('Failed to post review');
     } finally {
       setSubmitting(false);

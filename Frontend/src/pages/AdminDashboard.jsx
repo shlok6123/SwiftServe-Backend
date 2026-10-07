@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import adminService from '../services/adminService';
@@ -12,17 +12,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (isAuthenticated && user?.userRole === 'ADMIN') {
-      fetchData();
-    }
-  }, [activeTab]);
-
-  if (!isAuthenticated || user?.userRole !== 'ADMIN') {
-    return <Navigate to="/" />;
-  }
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -36,19 +26,29 @@ const AdminDashboard = () => {
       } else {
         setError(res.message);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to fetch data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.userRole === 'ADMIN') {
+      fetchData();
+    }
+  }, [activeTab, isAuthenticated, user, fetchData]);
+
+  if (!isAuthenticated || user?.userRole !== 'ADMIN') {
+    return <Navigate to="/" />;
+  }
 
   const handleDeleteUser = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
         const res = await adminService.deleteUser(id);
         if (res.success) fetchData();
-      } catch (err) {
+      } catch {
         alert('Failed to delete user');
       }
     }
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
       try {
         const res = await adminService.deleteRestaurant(id);
         if (res.success) fetchData();
-      } catch (err) {
+      } catch {
         alert('Failed to delete restaurant');
       }
     }

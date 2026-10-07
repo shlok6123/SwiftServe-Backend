@@ -1,0 +1,499 @@
+/* ============================================
+   SwiftServe — Global Animation System
+   Reusable keyframes + utility classes
+   ============================================ */
+
+/* ---------- Keyframes ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-32px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(120%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOutRight {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(120%); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50% { box-shadow: 0 0 24px 4px var(--accent-glow); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---------- Entrance utility classes ---------- */
+.anim-fade-in { animation: fadeIn 0.6s ease forwards; }
+.anim-fade-up { animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.anim-fade-down { animation: fadeInDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.anim-fade-left { animation: fadeInLeft 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.anim-fade-right { animation: fadeInRight 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.anim-scale-in { animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.anim-pop-in { animation: popIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.anim-bounce-in { animation: bounceIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.anim-float { animation: float 5s ease-in-out infinite; }
+.anim-pulse-glow { animation: pulseGlow 2.5s ease-in-out infinite; }
+
+/* keep existing .fade-in class working */
+.fade-in { animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+/* ---------- Stagger helpers (apply alongside an anim class) ---------- */
+.stagger > * { opacity: 0; animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.12s; }
+.stagger > *:nth-child(3) { animation-delay: 0.19s; }
+.stagger > *:nth-child(4) { animation-delay: 0.26s; }
+.stagger > *:nth-child(5) { animation-delay: 0.33s; }
+.stagger > *:nth-child(6) { animation-delay: 0.40s; }
+.stagger > *:nth-child(7) { animation-delay: 0.47s; }
+.stagger > *:nth-child(8) { animation-delay: 0.54s; }
+.stagger > *:nth-child(9) { animation-delay: 0.61s; }
+.stagger > *:nth-child(10) { animation-delay: 0.68s; }
+.stagger > *:nth-child(n+11) { animation-delay: 0.75s; }
+
+/* Per-item delay variables for manual control */
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+
+/* ---------- Scroll reveal (driven by IntersectionObserver) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Interactive micro-interactions ---------- */
+.hover-lift { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease; }
+.hover-lift:hover { transform: translateY(-6px); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45); }
+
+.press-scale { transition: transform 0.12s ease; }
+.press-scale:active { transform: scale(0.95); }
+
+/* Add a subtle press feedback to all primary/secondary buttons globally */
+.btn { transition: var(--transition); }
+.btn:active { transform: scale(0.96); }
+
+/* Shine sweep used on buttons / cards */
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+.shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+.shine:hover::after { left: 140%; }
+
+/* ---------- Skeleton shimmer ---------- */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-tertiary) 50%,
+    var(--bg-secondary) 75%
+  );
+  background-size: 936px 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 8px;
+}
+
+/* ---------- Animated gradient text (overrides static gradient nicely) ---------- */
+.text-gradient-animated {
+  background: linear-gradient(90deg, #ef4444, #f97316, #f59e0b, #ef4444);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 6s ease infinite;
+}
+
+/* ---------- Page route transition wrapper ---------- */
+.route-fade { animation: fadeIn 0.4s ease forwards; }
+
+/* ---------- Respect reduced-motion preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
+
+/* ============================================
+   SwiftServe — Extended Animation System (v2)
+   Additional keyframes, utilities & micro-interactions
+   ============================================ */
+
+/* ---------- New keyframes ---------- */
+@keyframes spinSlow {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes blobMorph {
+  0%, 100% { border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%; }
+  33% { border-radius: 70% 30% 46% 54% / 30% 60% 40% 70%; }
+  66% { border-radius: 34% 66% 38% 62% / 64% 38% 62% 36%; }
+}
+
+@keyframes floatParticle {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(-120px) translateX(20px); opacity: 0; }
+}
+
+@keyframes shimmerText {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 16px -2px var(--accent-glow); }
+  50% { box-shadow: 0 0 30px 4px var(--accent-glow); }
+}
+
+@keyframes badgeBump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.45); }
+  70% { transform: scale(0.85); }
+  100% { transform: scale(1); }
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.3); }
+  50% { transform: scale(0.95); }
+  75% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+
+@keyframes slideDownIn {
+  from { opacity: 0; transform: translateY(-100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progressGrow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ---------- New entrance / loop utilities ---------- */
+.anim-blob { animation: blobMorph 12s ease-in-out infinite; }
+.anim-glow-pulse { animation: glowPulse 2.8s ease-in-out infinite; }
+.anim-spin-slow { animation: spinSlow 18s linear infinite; }
+.anim-wiggle:hover { animation: wiggle 0.5s ease; }
+.anim-heartbeat { animation: heartBeat 0.6s ease; }
+.anim-badge-bump { animation: badgeBump 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* ---------- 3D tilt / lift card hover ---------- */
+.card-3d {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s ease, border-color 0.35s ease;
+  transform-style: preserve-3d;
+}
+.card-3d:hover {
+  transform: translateY(-8px) perspective(900px) rotateX(2deg);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Glow border on hover ---------- */
+.glow-border {
+  position: relative;
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.glow-border:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 1px var(--accent-primary), 0 0 28px -6px var(--accent-glow);
+}
+
+/* ---------- Button ripple effect ---------- */
+.ripple-host { position: relative; overflow: hidden; }
+.ripple-host .ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+/* ---------- Animated shimmer gradient text (sweeping highlight) ---------- */
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--text-primary) 0%,
+    var(--text-primary) 40%,
+    #fbbf24 50%,
+    var(--text-primary) 60%,
+    var(--text-primary) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerText 4s linear infinite;
+}
+
+/* ---------- Floating particles layer ---------- */
+.particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.particles span {
+  position: absolute;
+  bottom: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  opacity: 0;
+  animation: floatParticle 9s linear infinite;
+}
+
+/* ---------- Top scroll progress bar ---------- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, #ef4444, #f97316, #f59e0b);
+  z-index: 2000;
+  will-change: transform;
+}
+
+/* ---------- Smoother route transition ---------- */
+.route-fade {
+  animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particles span,
+  .anim-blob,
+  .anim-glow-pulse,
+  .anim-spin-slow,
+  .text-shimmer { animation: none !important; }
+}
+
+/* ============================================
+   SwiftServe — Extended Animation System (v3)
+   Loaders, error feedback & richer micro-interactions
+   ============================================ */
+
+/* ---------- New keyframes ---------- */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes barStretch {
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(1); transform-origin: left; }
+  51% { transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes underlineGrow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ---------- Error / attention feedback ---------- */
+.anim-shake { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+/* ---------- Animated bouncing-dot loader ---------- */
+.dot-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.dot-loader span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+.dot-loader span:nth-child(2) { animation-delay: 0.16s; }
+.dot-loader span:nth-child(3) { animation-delay: 0.32s; }
+
+/* ---------- Inline indeterminate progress bar ---------- */
+.bar-loader {
+  position: relative;
+  height: 3px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--bg-tertiary);
+}
+.bar-loader::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #ef4444, #f97316, #f59e0b);
+  animation: barStretch 1.3s ease-in-out infinite;
+}
+
+/* ---------- Animated nav-link underline ---------- */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, #ef4444, #f97316);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-underline:hover::after { transform: scaleX(1); }
+
+/* ---------- Image zoom-on-hover wrapper ---------- */
+.img-zoom { overflow: hidden; }
+.img-zoom img {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.img-zoom:hover img { transform: scale(1.08); }
+
+/* ---------- Count-up stat entrance ---------- */
+.anim-count-up { animation: countUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dot-loader span,
+  .bar-loader::after,
+  .anim-shake { animation: none !important; }
+}
+
+/* ---------- Live updates indicator (global) ---------- */
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  width: fit-content;
+}
+.live-pill svg {
+  animation: glowPulse 2s ease-in-out infinite;
+  border-radius: 50%;
+}

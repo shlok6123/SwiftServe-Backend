@@ -1,33 +1,50 @@
 import { Star, Clock, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import favoriteService from '../services/favoriteService';
 import './RestaurantCard.css';
 
-const RestaurantCard = ({ restaurant }) => {
+const RestaurantCard = ({ restaurant, initialFavorite }) => {
   const { isAuthenticated } = useContext(AuthContext);
-  const [isFavorite, setIsFavorite] = useState(false); // Initial state should ideally come from props or a parent
+  // Initialize from an explicit prop, falling back to a backend flag if present.
+  const resolveFavorite = () =>
+    initialFavorite ?? restaurant?.favorite ?? restaurant?.isFavorite ?? false;
+  const [isFavorite, setIsFavorite] = useState(resolveFavorite);
+  const [beat, setBeat] = useState(false);
+
+  // Keep local state in sync if the parent re-fetches favorite status.
+  useEffect(() => {
+    setIsFavorite(resolveFavorite());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialFavorite, restaurant?.favorite, restaurant?.isFavorite]);
 
   const handleFavorite = async (e) => {
     e.preventDefault();
     if (!isAuthenticated) return;
+    // Play the heartbeat pop immediately for snappy feedback.
+    setBeat(true);
+    setTimeout(() => setBeat(false), 600);
     try {
       const res = await favoriteService.toggleFavorite(restaurant.id);
       if (res.success) setIsFavorite(res.data);
-    } catch (err) {
+    } catch {
       console.error('Failed to toggle favorite');
     }
   };
 
-  const imageUrl = `https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop&q=80&sig=${restaurant.id || Math.random()}`;
+  // Deterministic image per restaurant id (no impure Math.random in render).
+  const imageUrl = `https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop&q=80&sig=${restaurant.id ?? 'placeholder'}`;
 
   return (
-    <Link to={`/restaurant/${restaurant.id}`} className="restaurant-card glass">
-      <div className="restaurant-image">
+    <Link to={`/restaurant/${restaurant.id}`} className="restaurant-card glass hover-lift glow-border shine">
+      <div className="restaurant-image img-zoom">
         <img src={imageUrl} alt={restaurant.name} className="card-img" />
         {isAuthenticated && (
-          <button className={`favorite-btn ${isFavorite ? 'active' : ''}`} onClick={handleFavorite}>
+          <button
+            className={`favorite-btn ${isFavorite ? 'active' : ''} ${beat ? 'anim-heartbeat' : ''}`}
+            onClick={handleFavorite}
+          >
             <Heart size={20} fill={isFavorite ? "#ff4757" : "none"} color={isFavorite ? "#ff4757" : "#fff"} />
           </button>
         )}

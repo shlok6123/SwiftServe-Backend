@@ -36,7 +36,7 @@ public class CartController {
     }
 
     @PostMapping("/add-item")
-    public ResponseEntity<ApiResponse<Cart>> addItemToCart(@RequestBody CartItemRequest request,
+    public ResponseEntity<ApiResponse<Cart>> addItemToCart(@Valid @RequestBody CartItemRequest request,
             @RequestHeader("Authorization") String jwt) {
         Cart cart = cartService.addItemToCart(request, cleanJwt(jwt));
         ApiResponse<Cart> response = new ApiResponse<>(true, "Item added to cart", cart);

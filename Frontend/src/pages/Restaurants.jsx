@@ -1,10 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { RefreshCw } from 'lucide-react';
 import restaurantService from '../services/restaurantService';
+import favoriteService from '../services/favoriteService';
+import { AuthContext } from '../context/AuthContext';
 import RestaurantCard from '../components/RestaurantCard';
+import RestaurantCardSkeleton from '../components/RestaurantCardSkeleton';
 import './Restaurants.css';
 
 const Restaurants = () => {
+  const { isAuthenticated } = useContext(AuthContext);
   const [restaurants, setRestaurants] = useState([]);
+  const [favoriteIds, setFavoriteIds] = useState(() => new Set());
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
@@ -15,6 +21,7 @@ const Restaurants = () => {
   const fetchRestaurants = async (pageNum, isLoadMore = false, currentFilters = filters) => {
     if (isLoadMore) setLoadingMore(true);
     else setLoading(true);
+    setError('');
 
     try {
       const data = await restaurantService.getAll('', pageNum, 8, currentFilters.cuisine, currentFilters.rating);
@@ -28,7 +35,8 @@ const Restaurants = () => {
       
       setHasMore(!data.last);
     } catch (err) {
-      setError('Failed to fetch restaurants.');
+      // Surface the backend-normalized message when available.
+      setError(err?.friendlyMessage || 'Failed to fetch restaurants.');
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -39,6 +47,26 @@ const Restaurants = () => {
     setPage(0);
     fetchRestaurants(0, false);
   }, [filters]);
+
+  // Load the user's favorites once so cards can show the correct heart state.
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setFavoriteIds(new Set());
+      return;
+    }
+    let active = true;
+    favoriteService
+      .getFavorites()
+      .then((res) => {
+        if (!active || !res?.success) return;
+        const ids = (res.data || []).map((r) => r.id).filter(Boolean);
+        setFavoriteIds(new Set(ids));
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [isAuthenticated]);
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -52,7 +80,7 @@ const Restaurants = () => {
 
   return (
     <div className="restaurants-page container">
-      <div className="page-header d-flex justify-between align-items-end">
+      <div className="page-header d-flex justify-between align-items-end anim-fade-down">
         <div>
           <h1 className="page-title">Explore Restaurants</h1>
           <p className="page-subtitle">Discover the best food around you.</p>
@@ -78,30 +106,41 @@ const Restaurants = () => {
       </div>
 
       {loading && restaurants.length === 0 ? (
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Loading your next meal...</p>
+        <div className="restaurants-grid">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <RestaurantCardSkeleton key={i} />
+          ))}
         </div>
       ) : error ? (
-        <div className="error-message">
+        <div className="error-message anim-fade-in anim-shake" style={{ textAlign: 'center' }}>
           <p>{error}</p>
+          <button
+            className="btn btn-secondary shine mt-3"
+            onClick={() => fetchRestaurants(0, false)}
+          >
+            <RefreshCw size={16} /> Try Again
+          </button>
         </div>
       ) : restaurants.length === 0 ? (
-        <div className="empty-state">
+        <div className="empty-state anim-fade-in">
           <p>No restaurants found. Try adding some from the backend!</p>
         </div>
       ) : (
         <>
-          <div className="restaurants-grid">
+          <div className="restaurants-grid stagger" key={restaurants.length}>
             {restaurants.map((restaurant) => (
-              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              <RestaurantCard
+                key={restaurant.id}
+                restaurant={restaurant}
+                initialFavorite={favoriteIds.has(restaurant.id)}
+              />
             ))}
           </div>
           
           {hasMore && (
             <div className="load-more-container">
               <button 
-                className="btn btn-secondary" 
+                className="btn btn-secondary shine" 
                 onClick={handleLoadMore}
                 disabled={loadingMore}
               >

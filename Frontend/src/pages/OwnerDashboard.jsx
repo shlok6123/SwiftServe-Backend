@@ -1,14 +1,16 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import restaurantService from '../services/restaurantService';
-import menuService from '../services/menuService';
 import orderService from '../services/orderService';
-import { PlusCircle, Store, Trash2, Edit, ListOrdered, CheckCircle, Package, Clock, Eye } from 'lucide-react';
+import orderSocket from '../services/orderSocket';
+import { useToast } from '../context/ToastContext';
+import { PlusCircle, Store, Trash2, ListOrdered, CheckCircle, Package, Clock, Eye, Radio } from 'lucide-react';
 import './OwnerDashboard.css';
 
 const OwnerDashboard = () => {
   const { user, isAuthenticated } = useContext(AuthContext);
+  const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('restaurants'); // 'restaurants', 'add', 'orders'
   
@@ -16,6 +18,8 @@ const OwnerDashboard = () => {
   const [myRestaurants, setMyRestaurants] = useState([]);
   const [restaurantOrders, setRestaurantOrders] = useState([]);
   const [selectedRestaurantForOrders, setSelectedRestaurantForOrders] = useState('');
+  const [flashing, setFlashing] = useState({});
+  const orderSubRef = useRef(null);
 
   // Form states
   const [restaurantData, setRestaurantData] = useState({
@@ -29,33 +33,21 @@ const OwnerDashboard = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated && user?.userRole === 'RESTAURANT_OWNER') {
-      fetchMyRestaurants();
-    }
-  }, [isAuthenticated, user]);
-
-  useEffect(() => {
-    if (selectedRestaurantForOrders) {
-      fetchOrdersForRestaurant(selectedRestaurantForOrders);
-    }
-  }, [selectedRestaurantForOrders]);
-
-  const fetchMyRestaurants = async () => {
+  const fetchMyRestaurants = useCallback(async () => {
     try {
       const response = await restaurantService.getMyRestaurants();
       if (response.success) {
         setMyRestaurants(response.data);
-        if (response.data.length > 0 && !selectedRestaurantForOrders) {
-          setSelectedRestaurantForOrders(response.data[0].id);
-        }
+        setSelectedRestaurantForOrders((prev) =>
+          prev || (response.data.length > 0 ? response.data[0].id : '')
+        );
       }
     } catch (err) {
       console.error('Failed to fetch restaurants', err);
     }
-  };
+  }, []);
 
-  const fetchOrdersForRestaurant = async (restaurantId) => {
+  const fetchOrdersForRestaurant = useCallback(async (restaurantId) => {
     try {
       const response = await orderService.getRestaurantOrders(restaurantId);
       if (response.success) {
@@ -64,7 +56,52 @@ const OwnerDashboard = () => {
     } catch (err) {
       console.error('Failed to fetch orders', err);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.userRole === 'RESTAURANT_OWNER') {
+      fetchMyRestaurants();
+    }
+  }, [isAuthenticated, user, fetchMyRestaurants]);
+
+  useEffect(() => {
+    if (selectedRestaurantForOrders) {
+      fetchOrdersForRestaurant(selectedRestaurantForOrders);
+    }
+  }, [selectedRestaurantForOrders, fetchOrdersForRestaurant]);
+
+  // Live feed: merge pushed orders (new or status changes) for this restaurant.
+  useEffect(() => {
+    if (!selectedRestaurantForOrders) return;
+    if (orderSubRef.current) orderSubRef.current();
+
+    orderSubRef.current = orderSocket.subscribeToRestaurant(
+      selectedRestaurantForOrders,
+      (incoming) => {
+        if (!incoming?.id) return;
+        setRestaurantOrders((prev) => {
+          const exists = prev.some((o) => o.id === incoming.id);
+          const next = exists
+            ? prev.map((o) => (o.id === incoming.id ? { ...o, ...incoming } : o))
+            : [incoming, ...prev];
+          return next.sort((a, b) => b.id - a.id);
+        });
+        setFlashing((prev) => ({ ...prev, [incoming.id]: true }));
+        setTimeout(
+          () => setFlashing((prev) => ({ ...prev, [incoming.id]: false })),
+          1500
+        );
+        toast.info(`Order #${incoming.id} is now ${incoming.status}`);
+      }
+    );
+
+    return () => {
+      if (orderSubRef.current) {
+        orderSubRef.current();
+        orderSubRef.current = null;
+      }
+    };
+  }, [selectedRestaurantForOrders, toast]);
 
   const handleRestaurantChange = (e) => {
     setRestaurantData({ ...restaurantData, [e.target.name]: e.target.value });
@@ -96,7 +133,7 @@ const OwnerDashboard = () => {
       } else {
          setMessage({ type: 'error', text: response.message || 'Failed to add restaurant' });
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to add restaurant' });
     } finally {
       setLoading(false);
@@ -123,7 +160,7 @@ const OwnerDashboard = () => {
       } else {
         setMessage({ type: 'error', text: response.message || 'Failed to add menu item' });
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to add menu item' });
     } finally {
       setLoading(false);
@@ -149,7 +186,7 @@ const OwnerDashboard = () => {
       if (response.success) {
         fetchOrdersForRestaurant(selectedRestaurantForOrders);
       }
-    } catch (err) {
+    } catch {
       setMessage({ type: 'error', text: 'Failed to update order status' });
     }
   };
@@ -362,6 +399,11 @@ const OwnerDashboard = () => {
                   ))}
                 </select>
               </div>
+              {selectedRestaurantForOrders && (
+                <span className="live-pill mt-2" title="Live order feed active">
+                  <Radio size={13} /> Live feed on
+                </span>
+              )}
             </div>
 
             {!selectedRestaurantForOrders ? (
@@ -377,7 +419,7 @@ const OwnerDashboard = () => {
             ) : (
               <div className="orders-list">
                 {restaurantOrders.map(order => (
-                  <div key={order.id} className="order-card glass">
+                  <div key={order.id} className={`order-card glass hover-lift ${flashing[order.id] ? 'anim-glow-pulse' : ''}`}>
                     <div className="order-header">
                       <div className="order-id">
                         <h3>Order #{order.id}</h3>

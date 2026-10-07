@@ -1,0 +1,137 @@
+.driver-dashboard-page {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.deliveries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.delivery-card {
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.delivery-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.card-header h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+}
+
+.badge-pending {
+  background-color: rgba(221, 107, 32, 0.2);
+  color: #f6ad55;
+}
+
+.badge-accepted {
+  background-color: rgba(49, 130, 206, 0.2);
+  color: #63b3ed;
+}
+
+.badge-picked_up {
+  background-color: rgba(128, 90, 213, 0.2);
+  color: #b794f4;
+}
+
+.badge-in_transit {
+  background-color: rgba(49, 151, 149, 0.2);
+  color: #4fd1c5;
+}
+
+.badge-delivered {
+  background-color: rgba(56, 161, 105, 0.2);
+  color: #68d391;
+}
+
+.address-block {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.address-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: block;
+  font-weight: 500;
+}
+
+.address-block p {
+  margin: 0.15rem 0 0 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.empty-card {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+
+.empty-card p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.btn-block {
+  width: 100%;
+}

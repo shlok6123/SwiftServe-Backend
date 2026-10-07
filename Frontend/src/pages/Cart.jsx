@@ -55,7 +55,7 @@ const Cart = () => {
       } else {
         setError(response.message || 'Checkout failed');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred during checkout.');
     } finally {
       setCheckingOut(false);

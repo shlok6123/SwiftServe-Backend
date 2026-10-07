@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useCallback } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import authService from '../services/authService';
@@ -8,7 +8,7 @@ import { User, Mail, Shield, Save, ListOrdered, Heart } from 'lucide-react';
 import './Profile.css';
 
 const Profile = () => {
-  const { user, isAuthenticated, login } = useContext(AuthContext); 
+  const { user, isAuthenticated } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -19,6 +19,15 @@ const Profile = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [loading, setLoading] = useState(false);
 
+  const fetchFavorites = useCallback(async () => {
+    try {
+      const res = await favoriteService.getFavorites();
+      if (res.success) setFavorites(res.data);
+    } catch {
+      console.error('Failed to fetch favorites');
+    }
+  }, []);
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -27,16 +36,7 @@ const Profile = () => {
       });
       fetchFavorites();
     }
-  }, [user]);
-
-  const fetchFavorites = async () => {
-    try {
-      const res = await favoriteService.getFavorites();
-      if (res.success) setFavorites(res.data);
-    } catch (err) {
-      console.error('Failed to fetch favorites');
-    }
-  };
+  }, [user, fetchFavorites]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;

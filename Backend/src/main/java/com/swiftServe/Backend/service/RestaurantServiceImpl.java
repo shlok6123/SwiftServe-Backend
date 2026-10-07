@@ -3,6 +3,7 @@ package com.swiftServe.Backend.service;
 import com.swiftServe.Backend.dto.RestaurantDto;
 import com.swiftServe.Backend.entity.Restaurant;
 import com.swiftServe.Backend.entity.User;
+import com.swiftServe.Backend.exception.BusinessException;
 import com.swiftServe.Backend.exception.ResourceNotFoundException;
 import com.swiftServe.Backend.repository.RestaurantRepo;
 import com.swiftServe.Backend.repository.UserRepo;
@@ -39,6 +40,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurant.setContactNumber(dto.getContactNumber());
         restaurant.setImageUrl(dto.getImageUrl());
         restaurant.setDescription(dto.getDescription());
+        restaurant.setCuisine(dto.getCuisine());
         restaurant.setOwner(owner);
         restaurant.setIsOpen(true);
         restaurant.setRating(0.0);
@@ -60,6 +62,12 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public Page<Restaurant> searchWithFilters(String keyword, String cuisine, Double rating, Pageable pageable) {
+        if (keyword != null && keyword.trim().isEmpty()) {
+            keyword = null;
+        }
+        if (cuisine != null && cuisine.trim().isEmpty()) {
+            cuisine = null;
+        }
         log.info("Search with filters - keyword: {}, cuisine: {}, rating: {}", keyword, cuisine, rating);
         return restaurantRepo.searchWithFilters(keyword, cuisine, rating, pageable);
     }
@@ -71,13 +79,14 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!restaurant.getOwner().getEmail().equals(currentUserEmail)) {
-            throw new RuntimeException("You are not authorized to update this restaurant");
+            throw new BusinessException("You are not authorized to update this restaurant");
         }
 
         restaurant.setName(dto.getName());
         restaurant.setAddress(dto.getAddress());
         restaurant.setContactNumber(dto.getContactNumber());
         restaurant.setDescription(dto.getDescription());
+        restaurant.setCuisine(dto.getCuisine());
         if (dto.getImageUrl() != null) {
             restaurant.setImageUrl(dto.getImageUrl());
         }
@@ -93,11 +102,27 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!restaurant.getOwner().getEmail().equals(currentUserEmail)) {
-            throw new RuntimeException("You are not authorized to delete this restaurant");
+            throw new BusinessException("You are not authorized to delete this restaurant");
         }
 
         log.info("Deleting restaurant: {} (ID: {})", restaurant.getName(), id);
         restaurantRepo.delete(restaurant);
+    }
+
+    @Override
+    public Restaurant toggleOpen(Long id) {
+        Restaurant restaurant = restaurantRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with id: " + id));
+
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!restaurant.getOwner().getEmail().equals(currentUserEmail)) {
+            throw new BusinessException("You are not authorized to update this restaurant");
+        }
+
+        boolean newState = !Boolean.TRUE.equals(restaurant.getIsOpen());
+        restaurant.setIsOpen(newState);
+        log.info("Restaurant {} (id={}) is now {}", restaurant.getName(), id, newState ? "OPEN" : "CLOSED");
+        return restaurantRepo.save(restaurant);
     }
 
     @Override

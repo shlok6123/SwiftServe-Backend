@@ -49,8 +49,9 @@ public class DeliveryController {
     @PutMapping("/{id}/accept")
     public ResponseEntity<ApiResponse<Delivery>> acceptDelivery(
             @PathVariable Long id, 
-            @RequestHeader("X-Driver-Id") Long driverId) {
-        Delivery delivery = deliveryService.acceptDelivery(id, driverId);
+            @RequestHeader("X-Driver-Id") Long driverId,
+            @RequestHeader(value = "Authorization", required = false) String jwt) {
+        Delivery delivery = deliveryService.acceptDelivery(id, driverId, jwt);
         return ResponseEntity.ok(new ApiResponse<>(true, "Delivery accepted", delivery));
     }
 
@@ -59,8 +60,9 @@ public class DeliveryController {
     public ResponseEntity<ApiResponse<Delivery>> updateStatus(
             @PathVariable Long id,
             @RequestParam DeliveryStatus status,
-            @RequestHeader("X-Driver-Id") Long driverId) {
-        Delivery delivery = deliveryService.updateDeliveryStatus(id, status, driverId);
+            @RequestHeader("X-Driver-Id") Long driverId,
+            @RequestHeader(value = "Authorization", required = false) String jwt) {
+        Delivery delivery = deliveryService.updateDeliveryStatus(id, status, driverId, jwt);
         return ResponseEntity.ok(new ApiResponse<>(true, "Delivery status updated", delivery));
     }
 }

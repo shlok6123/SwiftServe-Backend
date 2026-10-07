@@ -1,0 +1,103 @@
+.toast-viewport {
+  position: fixed;
+  top: 90px;
+  right: 1.5rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 360px;
+  width: calc(100% - 3rem);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-primary);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  color: var(--text-primary);
+  overflow: hidden;
+  animation: slideInRight 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.toast-leaving {
+  animation: slideOutRight 0.3s ease forwards;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.toast-close:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: left;
+  animation: toastProgress 3.5s linear forwards;
+}
+
+@keyframes toastProgress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* Type variants */
+.toast-success { border-left-color: #10b981; }
+.toast-success .toast-icon { color: #10b981; }
+.toast-success .toast-progress { background: #10b981; }
+
+.toast-error { border-left-color: #ef4444; }
+.toast-error .toast-icon { color: #ef4444; }
+.toast-error .toast-progress { background: #ef4444; }
+
+.toast-info { border-left-color: #60a5fa; }
+.toast-info .toast-icon { color: #60a5fa; }
+.toast-info .toast-progress { background: #60a5fa; }
+
+@media (max-width: 600px) {
+  .toast-viewport {
+    top: auto;
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    max-width: none;
+  }
+}

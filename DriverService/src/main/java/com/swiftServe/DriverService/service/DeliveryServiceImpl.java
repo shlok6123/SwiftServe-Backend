@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 
 @Service
 public class DeliveryServiceImpl implements DeliveryService {
@@ -46,7 +50,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
-    public Delivery acceptDelivery(Long deliveryId, Long driverId) {
+    public Delivery acceptDelivery(Long deliveryId, Long driverId, String jwt) {
         Delivery delivery = deliveryRepo.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery not found"));
 
@@ -57,11 +61,13 @@ public class DeliveryServiceImpl implements DeliveryService {
         delivery.setDriverId(driverId);
         delivery.setStatus(DeliveryStatus.ACCEPTED);
         
-        return deliveryRepo.save(delivery);
+        Delivery saved = deliveryRepo.save(delivery);
+        updateCentralOrderStatus(delivery.getOrderId(), "OUT_FOR_DELIVERY", jwt);
+        return saved;
     }
 
     @Override
-    public Delivery updateDeliveryStatus(Long deliveryId, DeliveryStatus status, Long driverId) {
+    public Delivery updateDeliveryStatus(Long deliveryId, DeliveryStatus status, Long driverId, String jwt) {
         Delivery delivery = deliveryRepo.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery not found"));
 
@@ -72,6 +78,11 @@ public class DeliveryServiceImpl implements DeliveryService {
         delivery.setStatus(status);
         if (status == DeliveryStatus.DELIVERED) {
             delivery.setDeliveredAt(LocalDateTime.now());
+            updateCentralOrderStatus(delivery.getOrderId(), "DELIVERED", jwt);
+        } else if (status == DeliveryStatus.CANCELLED) {
+            updateCentralOrderStatus(delivery.getOrderId(), "CANCELLED", jwt);
+        } else {
+            updateCentralOrderStatus(delivery.getOrderId(), "OUT_FOR_DELIVERY", jwt);
         }
 
         return deliveryRepo.save(delivery);
@@ -80,5 +91,22 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Override
     public Delivery getDeliveryByOrderId(Long orderId) {
         return deliveryRepo.findByOrderId(orderId);
+    }
+
+    private void updateCentralOrderStatus(Long orderId, String status, String jwt) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "http://localhost:8080/api/v1/orders/" + orderId + "/status?status=" + status;
+            
+            HttpHeaders headers = new HttpHeaders();
+            if (jwt != null) {
+                headers.set("Authorization", jwt.startsWith("Bearer ") ? jwt : "Bearer " + jwt);
+            }
+            
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+            restTemplate.exchange(url, HttpMethod.PUT, entity, Object.class);
+        } catch (Exception e) {
+            System.err.println("Failed to sync status to Backend for order " + orderId + ": " + e.getMessage());
+        }
     }
 }

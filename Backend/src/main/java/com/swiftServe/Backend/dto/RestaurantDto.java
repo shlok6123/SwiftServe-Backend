@@ -18,4 +18,6 @@ public class RestaurantDto {
     private String contactNumber;
     
     private String imageUrl;
+
+    private String cuisine;
 }
